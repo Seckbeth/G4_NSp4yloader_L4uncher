@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>G4_Launcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== ESTILOS PIXEL ART GLOBALES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        :root {
+            --bg-color: #0a0a1a;
+            --text-color: #ffffff;
+            --border-color: #0088ff;
+            --shadow-color: #0088ff55;
+            --accent-color: #0088ff;
+            --inactive-color: #444466;
+            --success-color: #44ff88;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ===== MODO CLARO ===== */
+        body.light-mode {
+            --bg-color: #f0f0ff;
+            --text-color: #111133;
+            --border-color: #0055cc;
+            --shadow-color: #0055cc33;
+        }
+
+        /* ===== CONTENEDOR PRINCIPAL ===== */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--bg-color);
+            border: 4px solid var(--border-color);
+            box-shadow: 0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color);
+            padding: 24px 20px;
+            transition: background 0.3s, border-color 0.3s;
+            position: relative;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area img {
+            width: 48px;
+            height: 48px;
+            image-rendering: pixelated;
+            border: 2px solid var(--border-color);
+            padding: 2px;
+        }
+
+        .logo-area h1 {
+            font-size: 18px;
+            text-shadow: 4px 4px 0 var(--shadow-color);
+            color: var(--text-color);
+            letter-spacing: 2px;
+        }
+
+        .logo-area h1 span {
+            color: var(--accent-color);
+        }
+
+        /* ===== BOTÓN DE TEMA (Switch) ===== */
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 24px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-family: inherit;
+            image-rendering: pixelated;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+            box-shadow: 0 0 16px var(--shadow-color);
+        }
+
+        .theme-toggle:active {
+            transform: rotate(360deg);
+        }
+
+        /* ===== MENÚ PIXEL ===== */
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 16px 0;
+            position: relative;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: var(--shadow-color);
+        }
+
+        .menu-item.active {
+            border-color: var(--accent-color);
+            background: var(--shadow-color);
+        }
+
+        /* ===== FLECHA PIXEL PARPADEANTE ===== */
+        .arrow {
+            font-size: 22px;
+            color: var(--accent-color);
+            width: 30px;
+            text-align: center;
+            flex-shrink: 0;
+            animation: blinkArrow 1s infinite;
+            transition: opacity 0.2s;
+        }
+
+        .arrow.hidden {
+            opacity: 0;
+        }
+
+        @keyframes blinkArrow {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        .menu-label {
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: var(--text-color);
+            flex: 1;
+            line-height: 1.6;
+        }
+
+        .menu-label small {
+            font-size: 10px;
+            color: var(--inactive-color);
+            margin-left: 8px;
+        }
+
+        /* ===== SELECT PIXEL ===== */
+        .pixel-select {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 6px 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            width: auto;
+            min-width: 160px;
+        }
+
+        .pixel-select option {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .pixel-select:focus {
+            border-color: var(--success-color);
+        }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .btn-pixel {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 20px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0 var(--shadow-color);
+        }
+
+        .btn-pixel:hover:not(:disabled) {
+            background: var(--border-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 24px var(--shadow-color);
+        }
+
+        .btn-pixel:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: var(--inactive-color);
+            text-shadow: none;
+        }
+
+        .btn-pixel.primary {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-pixel.primary:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn-pixel.success {
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .btn-pixel.success:hover:not(:disabled) {
+            background: var(--success-color);
+            color: var(--bg-color);
+        }
+
+        .btn-pixel.danger {
+            border-color: #ff4466;
+            color: #ff4466;
+        }
+
+        /* ===== ESTADO ===== */
+        .status-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-icon {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .status-text {
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .status-text .highlight {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .status-text .success {
+            color: var(--success-color);
+        }
+
+        .status-text .error {
+            color: #ff4466;
+        }
+
+        /* ===== AYUDA / INFO ===== */
+        .help-btn {
+            background: none;
+            border: 1px solid var(--inactive-color);
+            color: var(--inactive-color);
+            padding: 4px 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+
+        .help-btn:hover {
+            border-color: var(--text-color);
+            color: var(--text-color);
+        }
+
+        .help-box {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            margin-top: 8px;
+            font-size: 10px;
+            line-height: 1.8;
+            display: none;
+            max-width: 100%;
+        }
+
+        .help-box.visible {
+            display: block;
+        }
+
+        /* ===== BOTONES DE NAVEGACIÓN ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            border-top: 2px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        /* ===== MODAL DE ACTUALIZACIÓN ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--bg-color);
+            border: 4px solid var(--border-color);
+            padding: 30px 24px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 48px var(--shadow-color);
+        }
+
+        .modal-box h2 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 0 var(--shadow-color);
+        }
+
+        .modal-box input {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            width: 100%;
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        .modal-box .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 520px) {
+            .container {
+                padding: 16px 12px;
+            }
+            .logo-area h1 {
+                font-size: 14px;
+            }
+            .menu-label {
+                font-size: 11px;
+            }
+            .menu-item {
+                padding: 8px 10px;
+            }
+            .pixel-select {
+                font-size: 10px;
+                min-width: 120px;
+            }
+            .btn-pixel {
+                font-size: 11px;
+                padding: 10px 14px;
+            }
+            .status-text {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .logo-area img {
+                width: 36px;
+                height: 36px;
+            }
+            .logo-area h1 {
+                font-size: 12px;
+            }
+            .arrow {
+                font-size: 18px;
+                width: 24px;
+            }
+            .theme-toggle {
+                font-size: 18px;
+                padding: 4px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="appContainer">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="logo-area">
+                <img src="logla.png" alt="G4 Logo" id="logoImg" />
+                <h1>G4<span>_</span>Launcher</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">🕹️</button>
+        </header>
+
+        <!-- ===== MENÚ PIXEL ===== -->
+        <div class="menu" id="mainMenu" role="menu">
+
+            <!-- Opción 1: Versión -->
+            <div class="menu-item active" data-step="1" role="menuitem" tabindex="0">
+                <span class="arrow" id="arrow1">▶</span>
+                <span class="menu-label">
+                    1. VERSIÓN:
+                    <select class="pixel-select" id="versionSelect">
+                        <!-- Se llena con JavaScript -->
+                    </select>
+                </span>
+                <button class="help-btn" data-help="version">ℹ️</button>
+            </div>
+            <div class="help-box" id="helpVersion">
+                <strong>HEKATE_6.5.3</strong> es la versión recomendada por su estabilidad.<br />
+                Compatible con firmware oficial hasta 22.5.0.
+            </div>
+
+            <!-- Opción 2: Conectar -->
+            <div class="menu-item" data-step="2" role="menuitem" tabindex="0">
+                <span class="arrow hidden" id="arrow2">▶</span>
+                <span class="menu-label">
+                    2. CONECTA TU SWITCH
+                    <small>cable OTG</small>
+                </span>
+                <button class="help-btn" data-help="otg">ℹ️</button>
+            </div>
+            <div class="help-box" id="helpOtg">
+                <strong>Activar OTG en tu móvil:</strong><br />
+                1. Ajustes → Conexiones → USB OTG.<br />
+                2. Activa la opción "OTG" o "USB Host".<br />
+                3. Si no la encuentras, busca "OTG" en los ajustes.
+            </div>
+
+            <!-- Opción 3: Estado -->
+            <div class="menu-item" data-step="3" role="menuitem" tabindex="0">
+                <span class="arrow hidden" id="arrow3">▶</span>
+                <span class="menu-label status-display">
+                    3. ESTADO:
+                    <span class="status-icon" id="statusIcon">🔴</span>
+                    <span class="status-text" id="statusText">NO DETECTADA</span>
+                </span>
+                <button class="help-btn" data-help="rcm">ℹ️</button>
+            </div>
+            <div class="help-box" id="helpRcm">
+                <strong>Poner Switch en modo RCM:</strong><br />
+                • <strong>Sin chip:</strong> Inserta un jig en el riel derecho. Presiona Volumen + y Power al mismo tiempo.<br />
+                • <strong>Con chip:</strong> Solo presiona Power.<br />
+                La pantalla se mantendrá negra (es normal).
+            </div>
+
+            <!-- Opción 4: Inyectar -->
+            <div class="menu-item" data-step="4" role="menuitem" tabindex="0">
+                <span class="arrow hidden" id="arrow4">▶</span>
+                <span class="menu-label">
+                    4. ▶ INYECTAR
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== BOTONES DE NAVEGACIÓN ===== -->
+        <div class="nav-buttons">
+            <button class="btn-pixel" id="backBtn">← ATRÁS</button>
+            <button class="btn-pixel primary" id="nextBtn">SIGUIENTE →</button>
+        </div>
+
+        <!-- ===== BOTÓN OCULTO ACTUALIZACIÓN (doble clic en logo) ===== -->
+        <div style="text-align:center; margin-top: 16px; font-size:9px; color:var(--inactive-color); opacity:0.3;">
+            v1.0 · G4_Launcher
+        </div>
+    </div>
+
+    <!-- ===== MODAL ACTUALIZACIÓN ===== -->
+    <div class="modal-overlay" id="updateModal">
+        <div class="modal-box">
+            <h2>🔧 ACTUALIZAR REPOSITORIO</h2>
+            <p style="font-size:11px; margin-bottom:12px;">
+                Versiones actuales: <span id="currentVersionCount">0</span><br />
+                Última oficial: <span id="latestOfficialVersion">--</span>
+            </p>
+            <input type="password" id="adminPassword" placeholder="CONTRASEÑA" />
+            <div class="btn-row">
+                <button class="btn-pixel primary" id="checkUpdateBtn">📥 BUSCAR NUEVA</button>
+                <button class="btn-pixel danger" id="closeModalBtn">✕ CERRAR</button>
+            </div>
+            <div id="updateStatus" style="margin-top:12px; font-size:10px; color:var(--inactive-color);"></div>
+        </div>
+    </div>
+
+    <!-- ===== AUDIO ===== -->
+    <audio id="clickSound" preload="auto">
+        <source src="Switch%20Click.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script>
+        // =============================================
+        // ===== G4_LAUNCHER - LÓGICA COMPLETA =====
+        // =============================================
+
+        (function() {
+            'use strict';
+
+            // ===== ELEMENTOS DOM =====
+            const container = document.getElementById('appContainer');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const arrows = {
+                1: document.getElementById('arrow1'),
+                2: document.getElementById('arrow2'),
+                3: document.getElementById('arrow3'),
+                4: document.getElementById('arrow4')
+            };
+            const versionSelect = document.getElementById('versionSelect');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const themeToggle = document.getElementById('themeToggle');
+            const clickSound = document.getElementById('clickSound');
+            const logoImg = document.getElementById('logoImg');
+
+            // Modales y ayuda
+            const helpBtns = document.querySelectorAll('.help-btn');
+            const helpBoxes = {
+                version: document.getElementById('helpVersion'),
+                otg: document.getElementById('helpOtg'),
+                rcm: document.getElementById('helpRcm')
+            };
+            const updateModal = document.getElementById('updateModal');
+            const adminPassword = document.getElementById('adminPassword');
+            const checkUpdateBtn = document.getElementById('checkUpdateBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const currentVersionCount = document.getElementById('currentVersionCount');
+            const latestOfficialVersion = document.getElementById('latestOfficialVersion');
+            const updateStatus = document.getElementById('updateStatus');
+
+            // ===== ESTADO =====
+            let currentStep = 1;
+            let isConnected = false;
+            let device = null;
+            let payloadData = null;
+            let versionList = [];
+            let isDarkMode = true;
+
+            // ===== CONFIGURACIÓN =====
+            const REPO_OWNER = 'Seckbeth';
+            const REPO_NAME = 'G4_NSp4yloader_L4uncher';
+            const DEFAULT_VERSION = 'hekate_6.5.3';
+            const ADMIN_PASS = 'G4Launcher2025'; // Cambiar después
+            const HEKATE_REPO = 'CTCaer/hekate';
+
+            // ===== FUNCIONES DE AUDIO =====
+            function playClick() {
+                try {
+                    clickSound.currentTime = 0;
+                    clickSound.play().catch(e => console.log('Audio error:', e));
+                } catch (e) { console.log('Audio error:', e); }
+            }
+
+            // ===== FUNCIONES DE TEMA =====
+            function toggleTheme() {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('light-mode', !isDarkMode);
+                themeToggle.textContent = isDarkMode ? '🕹️' : '🎮';
+                playClick();
+                // Rotar el ícono
+                themeToggle.style.transform = 'rotate(360deg)';
+                setTimeout(() => { themeToggle.style.transform = ''; }, 400);
+            }
+
+            // ===== NAVEGACIÓN POR TECLADO =====
+            function moveStep(direction) {
+                const newStep = Math.min(4, Math.max(1, currentStep + direction));
+                if (newStep !== currentStep) {
+                    setStep(newStep);
+                }
+            }
+
+            function setStep(step) {
+                currentStep = step;
+                menuItems.forEach((item, index) => {
+                    const num = index + 1;
+                    item.classList.toggle('active', num === step);
+                    if (arrows[num]) {
+                        arrows[num].classList.toggle('hidden', num !== step);
+                    }
+                });
+                // Actualizar botones
+                backBtn.style.visibility = step > 1 ? 'visible' : 'hidden';
+                nextBtn.textContent = step === 4 ? '🚀 INYECTAR' : 'SIGUIENTE →';
+                nextBtn.disabled = (step === 4 && !isConnected);
+                // Si es paso 4 y está conectado, cambiar estilo
+                if (step === 4 && isConnected) {
+                    nextBtn.className = 'btn-pixel success';
+                    nextBtn.textContent = '💉 INYECTAR';
+                } else {
+                    nextBtn.className = 'btn-pixel primary';
+                    if (step !== 4) nextBtn.textContent = 'SIGUIENTE →';
+                }
+            }
+
+            // ===== CONEXIÓN USB =====
+            async function connectSwitch() {
+                try {
+                    setStatus('🔍', 'BUSCANDO...');
+                    device = await navigator.usb.requestDevice({
+                        filters: [{ vendorId: 0x0955 }]
+                    });
+                    await device.open();
+                    await device.claimInterface(0);
+                    isConnected = true;
+                    setStatus('🟢', '¡CONECTADA!', 'success');
+                    playClick(); // Sonido al detectar
+                    // Habilitar inyección si estamos en paso 4
+                    if (currentStep === 4) {
+                        nextBtn.disabled = false;
+                        nextBtn.className = 'btn-pixel success';
+                        nextBtn.textContent = '💉 INYECTAR';
+                    }
+                    return true;
+                } catch (err) {
+                    if (err.name === 'NotFoundError') {
+                        setStatus('🔴', 'NO DETECTADA', 'error');
+                    } else {
+                        setStatus('🔴', 'ERROR: ' + err.message, 'error');
+                    }
+                    isConnected = false;
+                    return false;
+                }
+            }
+
+            function setStatus(icon, text, type = '') {
+                statusIcon.textContent = icon;
+                statusText.innerHTML = text;
+                statusText.className = 'status-text ' + type;
+            }
+
+            // ===== INYECCIÓN =====
+            async function injectPayload() {
+                if (!device || !payloadData) {
+                    setStatus('⚠️', 'FALTA PAYLOAD O CONEXIÓN', 'error');
+                    return;
+                }
+                try {
+                    setStatus('⏳', 'INYECTANDO...');
+                    await device.transferOut(1, payloadData);
+                    setStatus('✅', '¡INYECTADO CON ÉXITO!', 'success');
+                    playClick();
+                } catch (err) {
+                    setStatus('❌', 'ERROR: ' + err.message, 'error');
+                }
+            }
+
+            // ===== CARGAR VERSIONES DESDE REPOSITORIO =====
+            async function loadVersions() {
+                try {
+                    const url =
+                        `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/versions.json`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('No se pudo cargar versions.json');
+                    const data = await response.json();
+                    versionList = data.versions || [];
+                    populateVersionSelect();
+                    return true;
+                } catch (err) {
+                    console.error('Error cargando versiones:', err);
+                    // Fallback: usar versiones por defecto
+                    versionList = [
+                        'hekate_6.5.3',
+                        'hekate_6.5.2',
+                        'hekate_6.5.1',
+                        'hekate_6.5.0',
+                        'hekate_6.4.0'
+                    ];
+                    populateVersionSelect();
+                    return false;
+                }
+            }
+
+            function populateVersionSelect() {
+                versionSelect.innerHTML = '';
+                const latest5 = versionList.slice(0, 5);
+                latest5.forEach(ver => {
+                    const opt = document.createElement('option');
+                    opt.value = ver;
+                    opt.textContent = ver.replace('hekate_', '');
+                    if (ver === DEFAULT_VERSION) opt.selected = true;
+                    versionSelect.appendChild(opt);
+                });
+                // Si no está el default, seleccionar el primero
+                if (!versionSelect.querySelector(`option[value="${DEFAULT_VERSION}"]`)) {
+                    versionSelect.selectedIndex = 0;
+                }
+                // Cargar payload por defecto
+                loadPayload(versionSelect.value);
+            }
+
+            // ===== CARGAR PAYLOAD DESDE REPOSITORIO =====
+            async function loadPayload(version) {
+                try {
+                    const url =
+                        `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${version}.bin`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Payload no encontrado');
+                    const buffer = await response.arrayBuffer();
+                    payloadData = new Uint8Array(buffer);
+                    setStatus('📦', `PAYLOAD: ${version}`, '');
+                    return true;
+                } catch (err) {
+                    console.error('Error cargando payload:', err);
+                    setStatus('⚠️', `ERROR: ${version} no disponible`, 'error');
+                    return false;
+                }
+            }
+
+            // ===== ACTUALIZAR REPOSITORIO (MANUAL) =====
+            async function checkForUpdates() {
+                const pass = adminPassword.value.trim();
+                if (pass !== ADMIN_PASS) {
+                    updateStatus.textContent = '❌ CONTRASEÑA INCORRECTA';
+                    updateStatus.style.color = '#ff4466';
+                    return;
+                }
+                updateStatus.textContent = '⏳ BUSCANDO ACTUALIZACIONES...';
+                updateStatus.style.color = 'var(--text-color)';
+
+                try {
+                    // Obtener última versión de Hekate desde API de GitHub
+                    const apiUrl = `https://api.github.com/repos/${HEKATE_REPO}/releases/latest`;
+                    const resp = await fetch(apiUrl);
+                    if (!resp.ok) throw new Error('Error consultando API');
+                    const data = await resp.json();
+                    const tag = data.tag_name.replace('v', '');
+                    const newVersion = `hekate_${tag}`;
+
+                    // Verificar si ya existe en versionList
+                    if (versionList.includes(newVersion)) {
+                        updateStatus.textContent = `✅ YA ESTÁS ACTUALIZADO (${newVersion})`;
+                        updateStatus.style.color = '#44ff88';
+                        return;
+                    }
+
+                    // Descargar el payload
+                    const binUrl =
+                    `https://github.com/${HEKATE_REPO}/releases/download/v${tag}/hekate_ctcaer_${tag}.bin`;
+                    const binResp = await fetch(binUrl);
+                    if (!binResp.ok) throw new Error('No se pudo descargar el payload');
+                    const binBuffer = await binResp.arrayBuffer();
+
+                    // Aquí se subiría al repositorio automáticamente (requiere token)
+                    // Por ahora, simulamos y damos instrucciones
+                    updateStatus.innerHTML =
+                        `✅ NUEVA VERSIÓN: <strong>${newVersion}</strong><br />` +
+                        `📥 Descárgala manualmente desde:<br />` +
+                        `<a href="${binUrl}" target="_blank" style="color:var(--accent-color);">${binUrl}</a><br />` +
+                        `📤 Súbela a tu repositorio como <strong>${newVersion}.bin</strong> y actualiza versions.json`;
+                    updateStatus.style.color = '#ffaa00';
+
+                    // Simular agregar a la lista local
+                    versionList.unshift(newVersion);
+                    populateVersionSelect();
+
+                } catch (err) {
+                    updateStatus.textContent = '❌ ERROR: ' + err.message;
+                    updateStatus.style.color = '#ff4466';
+                }
+            }
+
+            // ===== MANEJAR EVENTOS =====
+
+            // Navegación con teclado
+            document.addEventListener('keydown', (e) => {
+                if (updateModal.classList.contains('visible')) {
+                    if (e.key === 'Escape') closeModal();
+                    return;
+                }
+                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    moveStep(1);
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    moveStep(-1);
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNextAction();
+                }
+            });
+
+            // Clic en items del menú
+            menuItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    setStep(index + 1);
+                });
+            });
+
+            // Botones de navegación
+            backBtn.addEventListener('click', () => moveStep(-1));
+            nextBtn.addEventListener('click', handleNextAction);
+
+            async function handleNextAction() {
+                if (currentStep === 4) {
+                    // Inyectar
+                    await injectPayload();
+                    return;
+                }
+                if (currentStep === 1) {
+                    // Cargar payload seleccionado
+                    const selected = versionSelect.value;
+                    await loadPayload(selected);
+                    moveStep(1);
+                }
+                if (currentStep === 2) {
+                    // Conectar Switch
+                    await connectSwitch();
+                    if (isConnected) moveStep(1);
+                }
+                if (currentStep === 3) {
+                    // Mostrar estado y pasar a inyección
+                    if (isConnected) {
+                        moveStep(1);
+                    } else {
+                        setStatus('🔴', 'CONECTA LA SWITCH PRIMERO', 'error');
+                    }
+                }
+                // Avanzar al siguiente paso lógico
+                if (currentStep < 4 && (currentStep !== 3 || isConnected)) {
+                    moveStep(1);
+                } else if (currentStep === 3 && !isConnected) {
+                    // Intentar conectar automáticamente
+                    await connectSwitch();
+                    if (isConnected) moveStep(1);
+                }
+                // Si estamos en paso 1, después de seleccionar versión ir a paso 2
+                if (currentStep === 1) {
+                    moveStep(1);
+                }
+            }
+
+            // Cambio de versión
+            versionSelect.addEventListener('change', () => {
+                const selected = versionSelect.value;
+                loadPayload(selected);
+                if (currentStep === 1) {
+                    // Actualizar estado
+                    setStatus('📦', `PAYLOAD: ${selected}`, '');
+                }
+            });
+
+            // Ayuda (mostrar/ocultar)
+            helpBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const target = btn.dataset.help;
+                    if (target && helpBoxes[target]) {
+                        helpBoxes[target].classList.toggle('visible');
+                        // Ocultar los demás
+                        Object.keys(helpBoxes).forEach(key => {
+                            if (key !== target) helpBoxes[key].classList.remove('visible');
+                        });
+                    }
+                });
+            });
+
+            // Tema
+            themeToggle.addEventListener('click', toggleTheme);
+
+            // Doble clic en logo para abrir modal de actualización
+            logoImg.addEventListener('dblclick', () => {
+                updateModal.classList.add('visible');
+                adminPassword.value = '';
+                updateStatus.textContent = '';
+                currentVersionCount.textContent = versionList.length;
+                // Obtener última versión oficial
+                fetch(`https://api.github.com/repos/${HEKATE_REPO}/releases/latest`)
+                    .then(r => r.json())
+                    .then(d => {
+                        latestOfficialVersion.textContent = d.tag_name || '--';
+                    })
+                    .catch(() => { latestOfficialVersion.textContent = 'error'; });
+            });
+
+            // Modal
+            closeModalBtn.addEventListener('click', closeModal);
+            updateModal.addEventListener('click', (e) => {
+                if (e.target === updateModal) closeModal();
+            });
+            adminPassword.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') checkForUpdates();
+            });
+            checkUpdateBtn.addEventListener('click', checkForUpdates);
+
+            function closeModal() {
+                updateModal.classList.remove('visible');
+            }
+
+            // ===== INICIALIZACIÓN =====
+            async function init() {
+                // Verificar WebUSB
+                if (!navigator.usb) {
+                    setStatus('⚠️', 'USA CHROME PARA ESTO', 'error');
+                    nextBtn.disabled = true;
+                    return;
+                }
+
+                // Cargar versiones
+                await loadVersions();
+
+                // Configurar paso inicial
+                setStep(1);
+                setStatus('📦', 'PAYLOAD: ' + versionSelect.value, '');
+                await loadPayload(versionSelect.value);
+
+                // Intentar conexión automática al paso 2
+                console.log('G4_Launcher listo');
+            }
+
+            // ===== EXPONER FUNCIONES PARA DEBUG =====
+            window.g4 = {
+                connectSwitch,
+                injectPayload,
+                loadVersions,
+                loadPayload,
+                checkForUpdates,
+                toggleTheme
+            };
+
+            // Iniciar
+            init();
+
+        })();
+    </script>
+</body>
+</html>
